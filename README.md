@@ -1,8 +1,8 @@
-# ExcelGuard AI
+# ExcelGuard 
 
 ![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)
 
-**AI-powered validation platform for financial risk management** - automates Excel workbook validation to identify budget overruns, cash flow issues, and resource allocation problems. Reduces analysis time from 40 hours to 2 minutes.
+**Validation platform for financial risk management** - automates Excel workbook validation to identify budget overruns, cash flow issues, and resource allocation problems. Reduces analysis time from 40 hours to 2 minutes.
 
 **Built for Consulting Advisory** where analysts manually validated project financials across 200+ engagements. Due to data confidentiality requirements, cloud-based solutions (OpenAI, external APIs) could not be used as sensitive client financial data cannot be transmitted to external servers. This necessitated a fully local solution with all processing occurring on-premise.
 
