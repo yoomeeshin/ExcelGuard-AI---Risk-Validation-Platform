@@ -5,15 +5,15 @@
 
 An **AI-powered validation platform** for financial risk management. Automates Excel workbook validation to identify budget overruns, cash flow issues, and resource allocation problems - reducing analysis time from 40 hours to 2 minutes.
 
-**Built for Big 4 Risk Advisory** where analysts manually validated project financials across 200+ engagements. All processing runs locally for data security.
+**Built for Big 4 Risk Advisory** where analysts manually validated project financials across 200+ engagements. Due to data confidentiality requirements, cloud-based solutions (OpenAI, external APIs) could not be used as sensitive client financial data cannot be transmitted to external servers. This necessitated a fully local solution with all processing occurring on-premise.
 
 ---
 
 ## Key Features
 
 - **Multi-Agent Architecture**: Specialized validation agents (Rule Interpreter, Smart Validator, Anomaly Detector) working in parallel
-- **AI Rule Suggestions**: Analyzes data patterns and recommends validation rules automatically (email formats, outliers, date logic)
-- **100% Local Processing**: No data sent to external services - runs entirely on-premise
+- **AI Rule Suggestions**: Analyzes data patterns and recommends validation rules automatically using statistical methods (IQR, pattern recognition) - no external API calls required
+- **100% Local Processing**: All validation runs on-premise; no data transmitted to cloud services or external APIs (OpenAI, etc.) ensuring client confidentiality
 - **Fast**: Validates 500K+ cells in under 20 seconds using parallel processing
 - **Smart Validation**: Cross-sheet logic, temporal patterns, conditional sums, gap detection
 
@@ -67,5 +67,3 @@ curl -X POST http://localhost:5001/api/validate \
   -d '{"data_filename": "/path/to/data.xlsx", "rules_filename": "/path/to/rules.xlsx"}'
 ```
 ---
-
-**Impact**: Saved 312 hours annually per analyst, enabling proactive risk management instead of reactive problem-solving.
