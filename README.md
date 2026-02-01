@@ -4,7 +4,7 @@
 
 An **AI-powered validation platform** for financial risk management. Automates Excel workbook validation to identify budget overruns, cash flow issues, and resource allocation problems - reducing analysis time from 40 hours to 2 minutes.
 
-**Built for Big 4 Risk Advisory** where analysts manually validated project financials across 200+ engagements. Due to data confidentiality requirements, cloud-based solutions (OpenAI, external APIs) could not be used as sensitive client financial data cannot be transmitted to external servers. This necessitated a fully local solution with all processing occurring on-premise.
+**Built for Consulting Advisory** where analysts manually validated project financials across 200+ engagements. Due to data confidentiality requirements, cloud-based solutions (OpenAI, external APIs) could not be used as sensitive client financial data cannot be transmitted to external servers. This necessitated a fully local solution with all processing occurring on-premise.
 
 ---
 
