@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  excelguard:
+    build: .
+    container_name: excelguard-ai
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./validation_history.db:/app/validation_history.db
+    environment:
+      - FLASK_ENV=production
+      - MAX_UPLOAD_SIZE=50MB
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: excelguard-network

@@ -1,0 +1,58 @@
+# Configuration file for .gitignore
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application specific
+uploads/*
+!uploads/.gitkeep
+validation_history.db
+*.xlsx
+*.xls
+!templates/*.xlsx
+!demo_*.xlsx
+
+# Personal documentation (not for GitHub)
+PORTFOLIO_GUIDE.md
+PROJECT_COMPARISON.md
+TRANSFORMATION_SUMMARY.md
+START_HERE.md
+DEMO_GUIDE.md
+DEMO_SOLUTION.md
+GITHUB_CHECKLIST.md
+RISK_MANAGEMENT_FOCUS.md
+create_demo_*.py
+
+# Build artifacts
+DeloitteValidator_v1.0/
+build/
+excel_validator.spec
+run_app.bat
+package-lock.json
+
+# Docker
+*.log

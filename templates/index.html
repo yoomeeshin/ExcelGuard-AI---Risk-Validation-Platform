@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Workbench Validator</title>
+    <style>
+        :root {
+            --primary-color: #366092;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-bg: #f8f9fa;
+            --border-color: #dee2e6;
+            --text-muted: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .upload-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .upload-column {
+            background-color: var(--light-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .upload-column h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-column p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .file-upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(54, 96, 146, 0.05);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(54, 96, 146, 0.1);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-types {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2c4f7a;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-status {
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .file-status.success {
+            color: var(--success-color);
+        }
+
+        .file-status.error {
+            color: var(--danger-color);
+        }
+
+        .validation-section {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .validation-section.hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: var(--success-color);
+            color: #155724;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: var(--warning-color);
+            color: #856404;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: var(--danger-color);
+            color: #721c24;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-container {
+            margin: 2rem 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .results-section {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .file-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .file-info-item {
+            background-color: var(--light-bg);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .file-info-item strong {
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-info-item code {
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: white;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .upload-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .file-info {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>📊 Excel Workbench Validator</h1>
+            <p>Upload your files and validate your Excel workbook</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- File Upload Section -->
+        <div id="uploadSection">
+            <div class="upload-container">
+                <!-- Left Column: Data File -->
+                <div class="upload-column">
+                    <h2>📈 Data File</h2>
+                    <p>Upload your Excel workbook to validate</p>
+                    
+                    <div class="file-upload-area" onclick="document.getElementById('dataFile').click()">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Click to upload or drag and drop</div>
+                        <div class="file-types">Workbook files (.xlsx, .xlsm)</div>
+                        <input type="file" id="dataFile" class="file-input" accept=".xlsx,.xlsm">
+                    </div>
+                    
+                    <div id="dataFileStatus" class="file-status"></div>
+                </div>
+
+                <!-- Right Column: Rules File -->
+                <div class="upload-column">
+                    <h2>📋 Rules File</h2>
+                    <button id="downloadTemplate" class="btn btn-primary">📥 Download Rule Template</button>
+                    <p style="margin-top: 1rem;">Upload your validation rules Excel sheet</p>
+                    
+                    <div class="file-upload-area" onclick="document.getElementById('rulesFile').click()">
+                        <div class="upload-icon">📝</div>
+                        <div class="upload-text">Click to upload or drag and drop</div>
+                        <div class="file-types">Excel files (.xlsx, .xlsm)</div>
+                        <input type="file" id="rulesFile" class="file-input" accept=".xlsx,.xlsm">
+                    </div>
+                    
+                    <div id="rulesFileStatus" class="file-status"></div>
+                    
+                    <!-- Sheet Selection -->
+                    <div id="sheetSelectionContainer" class="hidden" style="margin-top: 1rem;">
+                        <label for="rulesSheet"><strong>Select Rules Sheet:</strong></label>
+                        <select id="rulesSheet" class="select"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Validation Button -->
+        <div id="readySection" class="validation-section hidden">
+            <h2>Ready to Validate</h2>
+            <button id="startValidation" class="btn btn-success" style="font-size: 1.2rem; padding: 1rem 2rem;">
+                🚀 Start Validation
+            </button>
+        </div>
+
+        <!-- Processing Section -->
+        <div id="processingSection" class="validation-section hidden">
+            <h2>Processing Validation</h2>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p style="margin-top: 1rem;"><span class="spinner"></span>Analyzing your files...</p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-section hidden">
+            <h2>✅ Validation Complete</h2>
+            
+            <!-- File Information -->
+            <div class="file-info">
+                <div class="file-info-item">
+                    <strong>📊 Data File:</strong>
+                    <code id="dataFileName"></code>
+                </div>
+                <div class="file-info-item">
+                    <strong>📋 Rules File:</strong>
+                    <code id="rulesFileName"></code>
+                </div>
+            </div>
+
+            <!-- Status Alert -->
+            <div id="statusAlert"></div>
+
+            <!-- Download Report -->
+            <div style="text-align: center; margin: 2rem 0;">
+                <button id="downloadReport" class="btn btn-success" style="font-size: 1.2rem; padding: 1rem 2rem;">
+                    📥 Download Validation Report
+                </button>
+                <p style="margin-top: 1rem; color: var(--text-muted);">
+                    💡 The Excel report contains detailed violation information and analysis
+                </p>
+            </div>
+
+            <!-- New Validation Button -->
+            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                <button id="newValidation" class="btn btn-primary">🔄 Run New Validation</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let uploadedFiles = {
+            dataFile: null,
+            rulesFile: null,
+            dataFilename: null,
+            rulesFilename: null,
+            availableSheets: []
+        };
+
+        let currentSessionId = null;
+
+        // DOM Elements
+        const dataFileInput = document.getElementById('dataFile');
+        const rulesFileInput = document.getElementById('rulesFile');
+        const dataFileStatus = document.getElementById('dataFileStatus');
+        const rulesFileStatus = document.getElementById('rulesFileStatus');
+        const sheetSelectionContainer = document.getElementById('sheetSelectionContainer');
+        const rulesSheetSelect = document.getElementById('rulesSheet');
+        const downloadTemplateBtn = document.getElementById('downloadTemplate');
+        const startValidationBtn = document.getElementById('startValidation');
+        const downloadReportBtn = document.getElementById('downloadReport');
+        const newValidationBtn = document.getElementById('newValidation');
+
+        // Section elements
+        const uploadSection = document.getElementById('uploadSection');
+        const readySection = document.getElementById('readySection');
+        const processingSection = document.getElementById('processingSection');
+        const resultsSection = document.getElementById('resultsSection');
+
+        // Initialize event listeners
+        function initializeEventListeners() {
+            dataFileInput.addEventListener('change', handleDataFileChange);
+            rulesFileInput.addEventListener('change', handleRulesFileChange);
+            downloadTemplateBtn.addEventListener('click', downloadTemplate);
+            startValidationBtn.addEventListener('click', startValidation);
+            downloadReportBtn.addEventListener('click', downloadReport);
+            newValidationBtn.addEventListener('click', resetApplication);
+
+            // Drag and drop functionality
+            setupDragAndDrop();
+        }
+
+        // Drag and drop setup
+        function setupDragAndDrop() {
+            const uploadAreas = document.querySelectorAll('.file-upload-area');
+            
+            uploadAreas.forEach(area => {
+                area.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    area.classList.add('dragover');
+                });
+
+                area.addEventListener('dragleave', () => {
+                    area.classList.remove('dragover');
+                });
+
+                area.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const targetInput = area.querySelector('input[type="file"]');
+                        targetInput.files = files;
+                        targetInput.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+        }
+
+        // File upload handlers
+        function handleDataFileChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadedFiles.dataFile = file;
+                dataFileStatus.textContent = `✅ ${file.name}`;
+                dataFileStatus.className = 'file-status success';
+                checkReadyState();
+            }
+        }
+
+        function handleRulesFileChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadedFiles.rulesFile = file;
+                rulesFileStatus.textContent = `✅ ${file.name}`;
+                rulesFileStatus.className = 'file-status success';
+                checkReadyState();
+            }
+        }
+
+        // Check if both files are uploaded and show ready section
+        function checkReadyState() {
+            if (uploadedFiles.dataFile && uploadedFiles.rulesFile) {
+                uploadFiles();
+            }
+        }
+
+        // Upload files to server
+        async function uploadFiles() {
+            try {
+                const formData = new FormData();
+                formData.append('data_file', uploadedFiles.dataFile);
+                formData.append('rules_file', uploadedFiles.rulesFile);
+
+                const response = await fetch('/api/upload-files', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    uploadedFiles.dataFilename = result.data_filename;
+                    uploadedFiles.rulesFilename = result.rules_filename;
+                    uploadedFiles.availableSheets = result.available_sheets;
+
+                    // Populate sheet selection
+                    rulesSheetSelect.innerHTML = '';
+                    result.available_sheets.forEach(sheet => {
+                        const option = document.createElement('option');
+                        option.value = sheet;
+                        option.textContent = sheet;
+                        rulesSheetSelect.appendChild(option);
+                    });
+
+                    // Show sheet selection if multiple sheets
+                    if (result.available_sheets.length > 1) {
+                        sheetSelectionContainer.classList.remove('hidden');
+                    }
+
+                    // Show ready section
+                    readySection.classList.remove('hidden');
+
+                    // Store original filenames for display
+                    uploadedFiles.originalDataName = result.data_file_original;
+                    uploadedFiles.originalRulesName = result.rules_file_original;
+
+                } else {
+                    showError('File upload failed: ' + result.error);
+                }
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showError('Upload failed: ' + error.message);
+            }
+        }
+
+        // Download template
+        async function downloadTemplate() {
+            try {
+                const response = await fetch('/api/download-template');
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'Rule_Template.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    showError('Failed to download template');
+                }
+            } catch (error) {
+                console.error('Template download error:', error);
+                showError('Template download failed: ' + error.message);
+            }
+        }
+
+        // Start validation
+        async function startValidation() {
+            try {
+                readySection.classList.add('hidden');
+                processingSection.classList.remove('hidden');
+
+                // Animate progress bar
+                animateProgress();
+
+                const requestData = {
+                    data_filename: uploadedFiles.dataFilename,
+                    rules_filename: uploadedFiles.rulesFilename,
+                    rules_sheet_name: rulesSheetSelect.value || uploadedFiles.availableSheets[0]
+                };
+
+                const response = await fetch('/api/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentSessionId = result.session_id;
+                    showResults(result);
+                } else {
+                    showError('Validation failed: ' + result.error);
+                    resetToReady();
+                }
+
+            } catch (error) {
+                console.error('Validation error:', error);
+                showError('Validation failed: ' + error.message);
+                resetToReady();
+            }
+        }
+
+        // Show validation results
+        function showResults(result) {
+            processingSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+
+            // Set file names
+            document.getElementById('dataFileName').textContent = uploadedFiles.originalDataName;
+            document.getElementById('rulesFileName').textContent = uploadedFiles.originalRulesName;
+
+            // Set status alert
+            const statusAlert = document.getElementById('statusAlert');
+            if (result.total_violations > 0) {
+                const failedRules = new Set();
+                result.violations.forEach(v => failedRules.add(v.rule_id));
+                
+                statusAlert.className = 'alert alert-warning';
+                statusAlert.innerHTML = `⚠️ ${failedRules.size} rules did not pass - check your downloaded report for details`;
+            } else {
+                statusAlert.className = 'alert alert-success';
+                statusAlert.innerHTML = '✅ All validations passed!';
+            }
+        }
+
+        // Download report
+        async function downloadReport() {
+            if (!currentSessionId) {
+                showError('No session ID available for download');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/download-report/${currentSessionId}`);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `validation_report_${new Date().toISOString().slice(0,10)}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    const error = await response.json();
+                    showError('Failed to download report: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Report download error:', error);
+                showError('Report download failed: ' + error.message);
+            }
+        }
+
+        // Reset application for new validation
+        function resetApplication() {
+            uploadedFiles = {
+                dataFile: null,
+                rulesFile: null,
+                dataFilename: null,
+                rulesFilename: null,
+                availableSheets: []
+            };
+            currentSessionId = null;
+
+            // Reset file inputs
+            dataFileInput.value = '';
+            rulesFileInput.value = '';
+            dataFileStatus.textContent = '';
+            rulesFileStatus.textContent = '';
+
+            // Hide all sections except upload
+            readySection.classList.add('hidden');
+            processingSection.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+            sheetSelectionContainer.classList.add('hidden');
+        }
+
+        // Utility functions
+        function resetToReady() {
+            processingSection.classList.add('hidden');
+            readySection.classList.remove('hidden');
+        }
+
+        function animateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 90) {
+                    clearInterval(interval);
+                } else {
+                    width += Math.random() * 10;
+                    progressFill.style.width = Math.min(width, 90) + '%';
+                }
+            }, 500);
+
+            window.completeProgress = () => {
+                clearInterval(interval);
+                progressFill.style.width = '100%';
+            };
+        }
+
+        function showError(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger';
+            alertDiv.innerHTML = `<strong>Error:</strong> ${message}`;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+        });
+    </script>
+</body>
+</html>
