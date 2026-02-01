@@ -2,51 +2,37 @@
 
 ![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)
 
-An **AI-powered validation platform** for financial risk management. Automates Excel workbook validation to identify budget overruns, cash flow issues, and resource allocation problems - reducing analysis time from 40 hours to 2 minutes.
+**AI-powered validation platform for financial risk management** - automates Excel workbook validation to identify budget overruns, cash flow issues, and resource allocation problems. Reduces analysis time from 40 hours to 2 minutes.
 
 **Built for Consulting Advisory** where analysts manually validated project financials across 200+ engagements. Due to data confidentiality requirements, cloud-based solutions (OpenAI, external APIs) could not be used as sensitive client financial data cannot be transmitted to external servers. This necessitated a fully local solution with all processing occurring on-premise.
 
 ---
 
-## Key Features
+## Technical Overview
 
-- **Multi-Agent Architecture**: Specialized validation agents (Rule Interpreter, Smart Validator, Anomaly Detector) working in parallel
-- **AI Rule Suggestions**: Analyzes data patterns and recommends validation rules automatically using statistical methods (IQR, pattern recognition) - no external API calls required
-- **100% Local Processing**: All validation runs on-premise; no data transmitted to cloud services or external APIs (OpenAI, etc.) ensuring client confidentiality
-- **Fast**: Validates 500K+ cells in under 20 seconds using parallel processing
-- **Smart Validation**: Cross-sheet logic, temporal patterns, conditional sums, gap detection
+**Local Processing**: Flask 3.1 REST API + Pandas 3.0 DataFrames + openpyxl 3.1 for cell-level Excel manipulation. Zero external API calls.
 
----
+**Multi-Agent Architecture**: Specialized agents (SupervisorAgent, RuleInterpreterAgent, SmartRuleInterpreter, RowValidatorAgent) coordinated via ThreadPoolExecutor for parallel execution - validates 500K+ cells in <20 seconds.
 
-## Technology Stack
+**Statistical Rule Suggestions**: IQR outlier detection, regex pattern matching (email/phone/SSN), and cardinality analysis to auto-recommend validation rules.  
 
-| Component | Technology |
-|-----------|-----------|
-| **Backend** | Flask 3.1+ |
-| **Data Processing** | Pandas 3.0+, openpyxl 3.1+ |
-| **Concurrency** | ThreadPoolExecutor (5-8x speedup) |
-| **AI Engine** | Statistical analysis (IQR), Pattern recognition |
-| **Deployment** | Docker, docker-compose |
+**Smart Validation**: Cross-sheet logic (gap detection, conditional sums, temporal patterns), 10+ operators (>, >=, regex, contains, date_future), accounting format handling `(123.45)` → `-123.45`.
+
+**Source Attribution**: Every violation includes cell address, rule ID, and suggested fix for audit trails.
 
 ---
 
 ## Quick Start
 
 ```bash
-# Clone and install
+# Local
 git clone https://github.com/yourusername/excelguard-ai.git
 cd excelguard-ai
-python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
+python app.py  # http://localhost:5001
 
-# Run
-python app.py
-# Visit http://localhost:5001
-```
-
-**Docker:**
-```bash
+# Docker
 docker-compose up -d
 ```
 
@@ -54,15 +40,23 @@ docker-compose up -d
 
 ## Usage
 
-1. Upload your Excel workbook (data file)
-2. Upload validation rules file
-3. Click "Start Validation"
-4. Download detailed report with violations and suggested fixes
+**Web Interface**: Upload Excel workbook + validation rules → Click "Start Validation" → Download report with violations
 
-**API Integration:**
+**API**:
 ```bash
 curl -X POST http://localhost:5001/api/validate \
   -H "Content-Type: application/json" \
-  -d '{"data_filename": "/path/to/data.xlsx", "rules_filename": "/path/to/rules.xlsx"}'
+  -d '{"data_filename": "data.xlsx", "rules_filename": "rules.xlsx"}'
 ```
+---
+
+## Tech Stack
+
+```python
+Flask==3.1.0           # REST API
+pandas==3.0.0          # DataFrame processing
+openpyxl==3.1.2        # Excel manipulation
+flask-cors==4.0.0      # CORS support
+```
+
 ---
